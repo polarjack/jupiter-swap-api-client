@@ -1245,6 +1245,7 @@ dependencies = [
  "anyhow",
  "bincode",
  "jupiter-swap-api-client",
+ "serde_qs",
  "solana-client",
  "solana-sdk",
  "tokio",
