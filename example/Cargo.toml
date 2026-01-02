@@ -11,3 +11,4 @@ solana-sdk = { workspace = true }
 solana-client = { workspace = true }
 anyhow = { workspace = true }
 bincode = "1.3.3"
+dotenvy = "0.15"

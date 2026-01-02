@@ -36,13 +36,25 @@ cargo test [test_name]
 ### Running the Example
 ```bash
 # Run the example (demonstrates full API usage)
+# The example automatically loads environment variables from .env file if present
 cargo run -p example
 
-# With custom API base URL
+# Using .env file (recommended)
+cp .env.example .env
+# Edit .env with your settings
+cargo run -p example
+
+# Or use environment variables directly
 API_BASE_URL=https://custom.api.url cargo run -p example
+
+# With API key authentication
+JUPITER_API_KEY=your-api-key-here cargo run -p example
 
 # With custom RPC URL
 SOLANA_RPC_URL=https://custom.rpc.url cargo run -p example
+
+# Combined (API key + custom URL)
+API_BASE_URL=https://custom.api.url JUPITER_API_KEY=your-api-key-here cargo run -p example
 ```
 
 ### Code Quality
@@ -76,10 +88,14 @@ The library follows Jupiter's API flow:
 ### Key Modules
 
 #### `lib.rs`
-The main entry point defining `JupiterSwapApiClient` with three primary methods:
+The main entry point defining `JupiterSwapApiClient` with:
+- `new()` - Creates client without API key
+- `new_with_api_key()` - Creates client with API key for authenticated endpoints
 - `quote()` - Requests a quote from Jupiter API
 - `swap()` - Requests a serialized swap transaction
 - `swap_instructions()` - Requests decomposed swap instructions
+
+API key (if provided) is sent as `x-api-key` header in all requests.
 
 Error handling uses `ClientError` enum with two variants:
 - `RequestFailed` - HTTP errors with status and body
@@ -146,6 +162,7 @@ All `Pubkey` fields use custom serialization via `field_as_string` to match Jupi
 
 ### Environment Variables
 - `API_BASE_URL` - Override Jupiter API endpoint (default: `https://quote-api.jup.ag/v6`)
+- `JUPITER_API_KEY` - API key for authenticated Jupiter API endpoints (optional, sent as `x-api-key` header)
 - `SOLANA_RPC_URL` - Override Solana RPC endpoint (for transaction submission in examples)
 
 ## Rust Toolchain

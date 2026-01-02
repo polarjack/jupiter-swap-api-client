@@ -32,7 +32,14 @@ const TEST_WALLET: Pubkey = pubkey!("2AQdpHJ2JpcEgPiATUXjQxA8QmafFegfQwSLWSprPic
 
 #[tokio::main]
 async fn main() {
-    let jupiter_swap_api_client = JupiterSwapApiClient::new("https://quote-api.jup.ag/v6");
+    // Create client without API key
+    let jupiter_swap_api_client = JupiterSwapApiClient::new("https://quote-api.jup.ag/v6".to_string());
+
+    // Or create client with API key for paid hosted APIs
+    let jupiter_swap_api_client = JupiterSwapApiClient::new_with_api_key(
+        "https://quote-api.jup.ag/v6".to_string(),
+        "your-api-key-here".to_string()
+    );
 
     let quote_request = QuoteRequest {
         amount: 1_000_000,
@@ -52,7 +59,7 @@ async fn main() {
             user_public_key: TEST_WALLET,
             quote_response: quote_response.clone(),
             config: TransactionConfig::default(),
-        })
+        }, None)
         .await
         .unwrap();
 
@@ -75,17 +82,50 @@ async fn main() {
 ```
 For the full example, please refer to the [examples](./example/) directory in this repository.
 
+### API Key Authentication
+
+Some Jupiter API endpoints require authentication via API key. You can provide your API key in three ways:
+
+**1. Using the constructor:**
+```rust
+let client = JupiterSwapApiClient::new_with_api_key(
+    "https://quote-api.jup.ag/v6".to_string(),
+    "your-api-key-here".to_string()
+);
+```
+
+**2. Using a `.env` file (recommended for development):**
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit .env and add your API key
+# JUPITER_API_KEY=your-api-key-here
+
+# Run the example (automatically loads .env)
+cargo run -p example
+```
+
+**3. Using environment variable:**
+```bash
+export JUPITER_API_KEY=your-api-key-here
+cargo run -p example
+```
+
+The API key will be sent as the `x-api-key` header in all requests.
+
 ### Using Self-hosted APIs
 
 You can set custom URLs via environment variables for any self-hosted Jupiter APIs. Like the [V6 Swap API](https://station.jup.ag/docs/apis/self-hosted) or the [paid hosted APIs](#paid-hosted-apis). Here are the ENV vars:
 
-```
+```bash
 API_BASE_URL=https://hosted.api
+JUPITER_API_KEY=your-api-key-here  # Optional, for authenticated endpoints
 ```
 
 ### Paid Hosted APIs
 
-You can also check out some of the [paid hosted APIs](https://station.jup.ag/docs/apis/self-hosted#paid-hosted-apis).
+You can also check out some of the [paid hosted APIs](https://station.jup.ag/docs/apis/self-hosted#paid-hosted-apis). These typically require API key authentication.
 
 ## Additional Resources
 
