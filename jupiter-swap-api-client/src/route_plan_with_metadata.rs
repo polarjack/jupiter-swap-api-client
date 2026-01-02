@@ -11,6 +11,9 @@ pub type RoutePlanWithMetadata = Vec<RoutePlanStep>;
 pub struct RoutePlanStep {
     pub swap_info: SwapInfo,
     pub percent: u8,
+    /// BPS value (may not be present in lite API responses)
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub bps: Option<u16>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
@@ -29,8 +32,18 @@ pub struct SwapInfo {
     /// An estimation of the output amount into the AMM
     #[serde(with = "field_as_string")]
     pub out_amount: u64,
-    #[serde(with = "field_as_string")]
-    pub fee_amount: u64,
-    #[serde(with = "field_as_string")]
-    pub fee_mint: Pubkey,
+    /// Fee amount (may not be present in lite API responses)
+    #[serde(
+        with = "crate::serde_helpers::option_field_as_string",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
+    pub fee_amount: Option<u64>,
+    /// Fee mint (may not be present in lite API responses)
+    #[serde(
+        with = "crate::serde_helpers::option_field_as_string",
+        skip_serializing_if = "Option::is_none",
+        default
+    )]
+    pub fee_mint: Option<Pubkey>,
 }
